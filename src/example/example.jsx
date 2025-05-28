@@ -1,8 +1,9 @@
+import "../index.css"; 
 import React from "react"
 import { useState } from "react"
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import { createClient } from "@supabase/supabase-js"
-import { AuthProvider } from "../AuthContext"
+import { AuthProvider, useAuth } from "../AuthContext"
 import { AuthWrapper } from "../components/auth-wrapper"
 
 const supabaseUrl = "https://api.altan.ai/tables/v2"
@@ -96,4 +97,11 @@ function App() {
   )
 }
 
-ReactDOM.render(<App />, document.getElementById("root"))
+
+const container = document.getElementById("root")
+const root = createRoot(container)
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)

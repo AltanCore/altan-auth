@@ -19,6 +19,7 @@
   "homepage": "https://github.com/AltanCore/altan-auth#readme",
   "description": "",
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
     "altan-auth": "file:",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

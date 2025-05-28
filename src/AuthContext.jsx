@@ -1,5 +1,8 @@
+import "./index.css";
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthService } from './AuthService';
+
+
 
 const AuthContext = createContext();
 
@@ -9,21 +12,17 @@ export function AuthProvider({ supabase, children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Inicializar sesión
     service.getSession().then(({ data, error }) => {
       if (error) {
         console.error('Error getting session:', error);
         setSession(null);
-      } else if (data && data.session) {
-        setSession(data.session);
       } else {
-        setSession(null);
+        setSession(data?.session ?? null);
       }
       setLoading(false);
     });
 
-    // Suscribirse a cambios de auth
-    const { subscription } = service.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = service.onAuthStateChange((event, session) => {
       switch (event) {
         case 'SIGNED_IN':
         case 'TOKEN_REFRESHED':
@@ -38,7 +37,11 @@ export function AuthProvider({ supabase, children }) {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, [service]);
 
   return (
@@ -50,10 +53,8 @@ export function AuthProvider({ supabase, children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
-}() => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (!ctx) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
   return ctx;
 }
