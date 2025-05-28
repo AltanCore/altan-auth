@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useAuth } from "../AuthContext"
 import React from 'react';
+import "./auth-styles.css"
 
 export function OAuthButton({ provider, options = {}, children, className }) {
   const { service } = useAuth()
@@ -21,7 +22,8 @@ export function OAuthButton({ provider, options = {}, children, className }) {
     <button
       onClick={handleOAuth}
       disabled={isLoading}
-      className={`flex items-center justify-center gap-2 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${className || ""}`}
+      className={`btn btn-oauth ${className || ""}`}
+      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", height: "3rem" }}
     >
       {provider === "google" && (
         <svg

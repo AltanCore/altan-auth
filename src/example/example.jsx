@@ -1,4 +1,3 @@
-import "../index.css"; 
 import React from "react"
 import { useState } from "react"
 import { createRoot } from "react-dom/client"
@@ -48,8 +47,6 @@ function AuthContainer() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold text-center mb-6">Altan Authentication</h1>
-
       {authMessage && (
         <div
           className={`p-4 mb-4 rounded-md ${authMessage.includes("Error") ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}
