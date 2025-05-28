@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,24 @@
     "url": "https://github.com/AltanCore/altan-auth/issues"
   },
   "homepage": "https://github.com/AltanCore/altan-auth#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "altan-auth": "file:",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.3",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-react": "^7.27.1",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@vitejs/plugin-react": "^4.5.0",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "rollup": "^2.79.2",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "tailwindcss": "^4.1.7",
+    "vite": "^6.3.5"
+  }
 }

@@ -1,5 +1,7 @@
 export { AuthProvider, useAuth } from './AuthContext';
-export * from './components/SignUpForm';
-export * from './components/SignInForm';
-export * from './components/OAuthButton';
-export * from './components/UserProfile';
+export * from './components/auth-wrapper';
+export * from './components/sign-in-form';
+export * from './components/sign-up-form';
+export * from './components/oauth-button';
+
+import './styles.css';
