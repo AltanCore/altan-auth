@@ -30,9 +30,9 @@ export class AuthService {
   }
 
   /**
-  * Sign in with OAuth provider via popup
-  * Returns a promise resolving to { session, provider } on success
-  */
+   * Sign in with OAuth provider via popup
+   * Returns a promise resolving to { session, provider } on success
+   */
   async signInWithOAuth(provider) {
     console.log('🔵 Starting OAuth sign-in flow for provider:', provider);
     const options = {
@@ -59,9 +59,11 @@ export class AuthService {
       throw new Error('No OAuth URL returned from Supabase');
     }
 
-    console.log('🔵 Opening OAuth popup window at URL:', data.url);
+    const oauthUrl = data.url;
+    const oauthOrigin = new URL(oauthUrl).origin;
+    console.log('🔵 Opening OAuth popup window at URL:', oauthUrl);
     const popup = window.open(
-      data.url,
+      oauthUrl,
       `${provider}-oauth-popup`,
       'width=500,height=600,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes'
     );
@@ -120,23 +122,11 @@ export class AuthService {
       // 2) Listen for postMessage from the popup
       const onMessage = async (event) => {
         console.log('🔵 Message received from popup:', event.origin, event.data);
-        if (event.origin !== window.location.origin) return;
-
         const msg = event.data;
         if (!msg || typeof msg !== 'object') return;
 
-        // Structured success message
-        if (msg.type === 'oauth_success' && msg.session) {
-          console.log('🟢 Received oauth_success message');
-          finish(msg.session);
-        }
-        // Structured error message
-        else if (msg.type === 'oauth_error') {
-          console.log('🔴 Received oauth_error message');
-          fail(msg.error || 'OAuth authentication failed');
-        }
-        // Direct token response
-        else if (msg.access_token && msg.user) {
+        // Direct token response: always accept
+        if (msg.access_token && msg.user) {
           console.log('🟢 Received direct token response');
           const session = {
             access_token: msg.access_token,
@@ -156,6 +146,18 @@ export class AuthService {
             console.warn('⚠️ Failed to set session in Supabase client:', e);
           }
           finish(session);
+          return;
+        }
+
+        // Structured messages: validate origin
+        if (event.origin !== window.location.origin && event.origin !== oauthOrigin) return;
+
+        if (msg.type === 'oauth_success' && msg.session) {
+          console.log('🟢 Received oauth_success message');
+          finish(msg.session);
+        } else if (msg.type === 'oauth_error') {
+          console.log('🔴 Received oauth_error message');
+          fail(msg.error || 'OAuth authentication failed');
         }
       };
       window.addEventListener('message', onMessage);
@@ -187,6 +189,7 @@ export class AuthService {
       }, 5 * 60 * 1000);
     });
   }
+
   // Sign out
   async signOut() {
     const { error } = await this.supabase.auth.signOut();
