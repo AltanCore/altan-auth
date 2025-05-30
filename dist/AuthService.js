@@ -274,7 +274,7 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                           persist = _objectSpread(_objectSpread({}, session), {}, {
                             expires_at: now + session.expires_in
                           });
-                          localStorage.setItem('supabase.auth.token', JSON.stringify(persist));
+                          localStorage.setItem('sb-database-auth-token', JSON.stringify(persist));
                           console.log('🟢 Session manually persisted to localStorage');
                           _context3.next = 24;
                           break;
