@@ -137,9 +137,7 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                 scopes: 'email profile',
                 skipBrowserRedirect: true
               };
-              console.log('🔑 Built OAuth options:', options);
-
-              // Request the OAuth URL
+              ;
               _context5.next = 5;
               return this.supabase.auth.signInWithOAuth({
                 provider: provider,
@@ -149,41 +147,32 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
               _yield$this$supabase$3 = _context5.sent;
               data = _yield$this$supabase$3.data;
               error = _yield$this$supabase$3.error;
-              console.log('🔵 supabase.auth.signInWithOAuth response:', {
-                data: data,
-                error: error
-              });
               if (!error) {
+                _context5.next = 10;
+                break;
+              }
+              throw error;
+            case 10:
+              if (data !== null && data !== void 0 && data.url) {
                 _context5.next = 12;
                 break;
               }
-              console.error('🔴 Error requesting OAuth URL:', error);
-              throw error;
-            case 12:
-              if (data !== null && data !== void 0 && data.url) {
-                _context5.next = 15;
-                break;
-              }
-              console.error('🔴 No OAuth URL returned');
               throw new Error('No OAuth URL returned from Supabase');
-            case 15:
+            case 12:
               oauthUrl = data.url;
               console.log('🔵 Opening OAuth popup window at URL:', oauthUrl);
               popup = window.open(oauthUrl, "".concat(provider, "-oauth-popup"), 'width=500,height=600,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes');
               if (popup) {
-                _context5.next = 21;
+                _context5.next = 17;
                 break;
               }
-              console.error('🔴 Popup blocked');
               throw new Error('Popup blocked. Please allow popups and try again.');
-            case 21:
-              console.log('🔵 Popup opened successfully');
+            case 17:
               return _context5.abrupt("return", new Promise(function (resolve, reject) {
                 var checkInterval = null;
                 var authSub = null;
                 var resolved = false;
                 var cleanup = function cleanup() {
-                  console.log('🔵 Cleaning up listeners and popup');
                   if (authSub) {
                     authSub.data.subscription.unsubscribe();
                     authSub = null;
@@ -195,20 +184,15 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                   }
                   if (!popup.closed) {
                     popup.close();
-                    console.log('🔵 Popup closed by cleanup');
                   }
                 };
                 var finish = function finish(session) {
-                  var _session$user;
                   if (resolved) return;
                   resolved = true;
-                  console.log('🟢 OAuth flow succeeded, provider:', provider, 'user:', (_session$user = session.user) === null || _session$user === void 0 ? void 0 : _session$user.email);
-                  // Notify application about auth state change without page reload
                   try {
                     window.dispatchEvent(new CustomEvent('supabase:session', {
                       detail: session
                     }));
-                    console.log('🔔 Dispatched supabase:session event');
                   } catch (e) {
                     console.warn('⚠️ Failed to dispatch auth change event:', e);
                   }
@@ -221,39 +205,31 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                 var fail = function fail(errMsg) {
                   if (resolved) return;
                   resolved = true;
-                  console.error('🔴 OAuth flow failed:', errMsg);
                   cleanup();
                   reject(new Error(errMsg));
                 };
-
-                // 1) Listen for Supabase auth state changes (SIGN_IN event)
                 authSub = _this.supabase.auth.onAuthStateChange(function (event, session) {
-                  console.log('🔵 onAuthStateChange event:', event, 'session:', session);
                   if (event === 'SIGNED_IN' && session) {
                     finish(session);
                   }
                 });
-
-                // 2) Listen for postMessage from the popup
                 var onMessage = /*#__PURE__*/function () {
                   var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(event) {
                     var msg, _msg$expires_in, _msg$token_type, session, _yield$_this$supabase, setData, setError, now, persist;
                     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
                       while (1) switch (_context3.prev = _context3.next) {
                         case 0:
-                          console.log('🔵 Message received from popup:', event.origin, event.data);
                           msg = event.data;
                           if (!(!msg || _typeof(msg) !== 'object')) {
-                            _context3.next = 4;
+                            _context3.next = 3;
                             break;
                           }
                           return _context3.abrupt("return");
-                        case 4:
+                        case 3:
                           if (!(msg.access_token && msg.user)) {
-                            _context3.next = 26;
+                            _context3.next = 22;
                             break;
                           }
-                          console.log('🟢 Received direct token response');
                           session = {
                             access_token: msg.access_token,
                             refresh_token: msg.refresh_token,
@@ -261,14 +237,13 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                             expires_in: (_msg$expires_in = msg.expires_in) !== null && _msg$expires_in !== void 0 ? _msg$expires_in : 3600,
                             token_type: (_msg$token_type = msg.token_type) !== null && _msg$token_type !== void 0 ? _msg$token_type : 'bearer'
                           };
-                          console.log('🔑 Constructed session from token response:', session);
-                          _context3.prev = 8;
-                          _context3.next = 11;
+                          _context3.prev = 5;
+                          _context3.next = 8;
                           return _this.supabase.auth.setSession({
                             access_token: msg.access_token,
                             refresh_token: msg.refresh_token
                           });
-                        case 11:
+                        case 8:
                           _yield$_this$supabase = _context3.sent;
                           setData = _yield$_this$supabase.data;
                           setError = _yield$_this$supabase.error;
@@ -277,88 +252,76 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                           } else {
                             console.log('🟢 Session set in Supabase client:', setData.session);
                           }
-                          _context3.next = 20;
+                          _context3.next = 17;
                           break;
-                        case 17:
-                          _context3.prev = 17;
-                          _context3.t0 = _context3["catch"](8);
+                        case 14:
+                          _context3.prev = 14;
+                          _context3.t0 = _context3["catch"](5);
                           console.warn('⚠️ Failed to set session in Supabase client:', _context3.t0);
-                        case 20:
-                          // Fallback: manually persist to localStorage
+                        case 17:
                           now = Math.floor(Date.now() / 1000);
                           persist = _objectSpread(_objectSpread({}, session), {}, {
                             expires_at: now + session.expires_in
                           });
                           localStorage.setItem('sb-database-auth-token', JSON.stringify(persist));
-                          console.log('🟢 Session manually persisted to localStorage');
                           finish(session);
                           return _context3.abrupt("return");
-                        case 26:
+                        case 22:
                           // Structured messages (oauth_success / oauth_error)
                           if (msg.type === 'oauth_success' && msg.session) {
-                            console.log('🟢 Received oauth_success message');
                             finish(msg.session);
                           } else if (msg.type === 'oauth_error') {
-                            console.log('🔴 Received oauth_error message');
                             fail(msg.error || 'OAuth authentication failed');
                           }
-                        case 27:
+                        case 23:
                         case "end":
                           return _context3.stop();
                       }
-                    }, _callee3, null, [[8, 17]]);
+                    }, _callee3, null, [[5, 14]]);
                   }));
                   return function onMessage(_x6) {
                     return _ref.apply(this, arguments);
                   };
                 }();
                 window.addEventListener('message', onMessage);
-
-                // 3) Poll for popup close / final session check
                 checkInterval = setInterval(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
                   var _yield$_this$supabase2, session;
                   return _regeneratorRuntime().wrap(function _callee4$(_context4) {
                     while (1) switch (_context4.prev = _context4.next) {
                       case 0:
                         if (!popup.closed) {
-                          _context4.next = 16;
+                          _context4.next = 13;
                           break;
                         }
-                        console.log('🔵 Popup detected as closed, checking final session');
                         clearInterval(checkInterval);
-                        _context4.prev = 3;
-                        _context4.next = 6;
+                        _context4.prev = 2;
+                        _context4.next = 5;
                         return _this.supabase.auth.getSession();
-                      case 6:
+                      case 5:
                         _yield$_this$supabase2 = _context4.sent;
                         session = _yield$_this$supabase2.data.session;
-                        console.log('🔑 Final session check result:', session);
                         if (session) {
                           finish(session);
                         } else {
                           fail('Authentication was cancelled');
                         }
-                        _context4.next = 16;
+                        _context4.next = 13;
                         break;
-                      case 12:
-                        _context4.prev = 12;
-                        _context4.t0 = _context4["catch"](3);
-                        console.error('🔴 Final session check error:', _context4.t0);
+                      case 10:
+                        _context4.prev = 10;
+                        _context4.t0 = _context4["catch"](2);
                         fail('Final authentication check failed');
-                      case 16:
+                      case 13:
                       case "end":
                         return _context4.stop();
                     }
-                  }, _callee4, null, [[3, 12]]);
+                  }, _callee4, null, [[2, 10]]);
                 })), 1000);
-
-                // 4) Overall timeout (5 minutes)
                 setTimeout(function () {
-                  console.error('🔴 Authentication timeout reached');
                   fail('Authentication timeout');
                 }, 5 * 60 * 1000);
               }));
-            case 23:
+            case 18:
             case "end":
               return _context5.stop();
           }
