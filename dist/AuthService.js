@@ -111,15 +111,15 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
       return signIn;
     }()
     /**
-    * Sign in with OAuth provider via popup
-    * Returns a promise resolving to { session, provider } on success
-    */
+     * Sign in with OAuth provider via popup
+     * Returns a promise resolving to { session, provider } on success
+     */
   }, {
     key: "signInWithOAuth",
     value: (function () {
       var _signInWithOAuth = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5(provider) {
         var _this = this;
-        var options, _yield$this$supabase$3, data, error, popup;
+        var options, _yield$this$supabase$3, data, error, oauthUrl, oauthOrigin, popup;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
@@ -164,15 +164,17 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
               console.error('🔴 No OAuth URL returned');
               throw new Error('No OAuth URL returned from Supabase');
             case 15:
-              console.log('🔵 Opening OAuth popup window at URL:', data.url);
-              popup = window.open(data.url, "".concat(provider, "-oauth-popup"), 'width=500,height=600,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes');
+              oauthUrl = data.url;
+              oauthOrigin = new URL(oauthUrl).origin;
+              console.log('🔵 Opening OAuth popup window at URL:', oauthUrl);
+              popup = window.open(oauthUrl, "".concat(provider, "-oauth-popup"), 'width=500,height=600,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes');
               if (popup) {
-                _context5.next = 20;
+                _context5.next = 22;
                 break;
               }
               console.error('🔴 Popup blocked');
               throw new Error('Popup blocked. Please allow popups and try again.');
-            case 20:
+            case 22:
               console.log('🔵 Popup opened successfully');
               return _context5.abrupt("return", new Promise(function (resolve, reject) {
                 var checkInterval = null;
@@ -229,39 +231,15 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                       while (1) switch (_context3.prev = _context3.next) {
                         case 0:
                           console.log('🔵 Message received from popup:', event.origin, event.data);
-                          if (!(event.origin !== window.location.origin)) {
-                            _context3.next = 3;
-                            break;
-                          }
-                          return _context3.abrupt("return");
-                        case 3:
                           msg = event.data;
                           if (!(!msg || _typeof(msg) !== 'object')) {
-                            _context3.next = 6;
+                            _context3.next = 4;
                             break;
                           }
                           return _context3.abrupt("return");
-                        case 6:
-                          if (!(msg.type === 'oauth_success' && msg.session)) {
-                            _context3.next = 11;
-                            break;
-                          }
-                          console.log('🟢 Received oauth_success message');
-                          finish(msg.session);
-                          _context3.next = 30;
-                          break;
-                        case 11:
-                          if (!(msg.type === 'oauth_error')) {
-                            _context3.next = 16;
-                            break;
-                          }
-                          console.log('🔴 Received oauth_error message');
-                          fail(msg.error || 'OAuth authentication failed');
-                          _context3.next = 30;
-                          break;
-                        case 16:
+                        case 4:
                           if (!(msg.access_token && msg.user)) {
-                            _context3.next = 30;
+                            _context3.next = 19;
                             break;
                           }
                           console.log('🟢 Received direct token response');
@@ -273,27 +251,42 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                             token_type: (_msg$token_type = msg.token_type) !== null && _msg$token_type !== void 0 ? _msg$token_type : 'bearer'
                           };
                           console.log('🔑 Constructed session from token response:', session);
-                          _context3.prev = 20;
-                          _context3.next = 23;
+                          _context3.prev = 8;
+                          _context3.next = 11;
                           return _this.supabase.auth.setSession({
                             access_token: msg.access_token,
                             refresh_token: msg.refresh_token
                           });
-                        case 23:
+                        case 11:
                           console.log('🟢 Session set in Supabase client');
-                          _context3.next = 29;
+                          _context3.next = 17;
                           break;
-                        case 26:
-                          _context3.prev = 26;
-                          _context3.t0 = _context3["catch"](20);
+                        case 14:
+                          _context3.prev = 14;
+                          _context3.t0 = _context3["catch"](8);
                           console.warn('⚠️ Failed to set session in Supabase client:', _context3.t0);
-                        case 29:
+                        case 17:
                           finish(session);
-                        case 30:
+                          return _context3.abrupt("return");
+                        case 19:
+                          if (!(event.origin !== window.location.origin && event.origin !== oauthOrigin)) {
+                            _context3.next = 21;
+                            break;
+                          }
+                          return _context3.abrupt("return");
+                        case 21:
+                          if (msg.type === 'oauth_success' && msg.session) {
+                            console.log('🟢 Received oauth_success message');
+                            finish(msg.session);
+                          } else if (msg.type === 'oauth_error') {
+                            console.log('🔴 Received oauth_error message');
+                            fail(msg.error || 'OAuth authentication failed');
+                          }
+                        case 22:
                         case "end":
                           return _context3.stop();
                       }
-                    }, _callee3, null, [[20, 26]]);
+                    }, _callee3, null, [[8, 14]]);
                   }));
                   return function onMessage(_x6) {
                     return _ref.apply(this, arguments);
@@ -345,7 +338,7 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                   fail('Authentication timeout');
                 }, 5 * 60 * 1000);
               }));
-            case 22:
+            case 24:
             case "end":
               return _context5.stop();
           }
