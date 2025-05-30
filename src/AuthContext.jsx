@@ -1,7 +1,6 @@
+// AuthContext.jsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthService } from './AuthService';
-
-
 
 const AuthContext = createContext();
 
@@ -10,6 +9,7 @@ export function AuthProvider({ supabase, children }) {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // 1) Inicializar sesión y suscripción a cambios de Supabase
   useEffect(() => {
     service.getSession().then(({ data, error }) => {
       if (error) {
@@ -37,11 +37,19 @@ export function AuthProvider({ supabase, children }) {
     });
 
     return () => {
-      if (subscription) {
-        subscription.unsubscribe();
-      }
+      if (subscription) subscription.unsubscribe();
     };
   }, [service]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      console.log('🏷️ supabase:session event received', e.detail);
+      setSession(e.detail);
+      setLoading(false);
+    };
+    window.addEventListener('supabase:session', handler);
+    return () => window.removeEventListener('supabase:session', handler);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ service, session, loading }}>
@@ -52,8 +60,6 @@ export function AuthProvider({ supabase, children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }

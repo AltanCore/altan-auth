@@ -60,7 +60,6 @@ export class AuthService {
     }
 
     const oauthUrl = data.url;
-    const oauthOrigin = new URL(oauthUrl).origin;
     console.log('🔵 Opening OAuth popup window at URL:', oauthUrl);
     const popup = window.open(
       oauthUrl,
@@ -96,16 +95,16 @@ export class AuthService {
       };
 
       const finish = (session) => {
-        // Notify application about auth state change without page reload
-        try {
-          window.dispatchEvent(new CustomEvent('supabase.auth.changed', { detail: session }));
-          console.log('🔔 Dispatched supabase.auth.changed event');
-        } catch (e) {
-          console.warn('⚠️ Failed to dispatch auth change event:', e);
-        }
         if (resolved) return;
         resolved = true;
         console.log('🟢 OAuth flow succeeded, provider:', provider, 'user:', session.user?.email);
+        // Notify application about auth state change without page reload
+        try {
+          window.dispatchEvent(new CustomEvent('supabase:session', { detail: session }));
+          console.log('🔔 Dispatched supabase:session event');
+        } catch (e) {
+          console.warn('⚠️ Failed to dispatch auth change event:', e);
+        }
         cleanup();
         resolve({ session, provider });
       };
@@ -144,7 +143,6 @@ export class AuthService {
           };
           console.log('🔑 Constructed session from token response:', session);
           try {
-            // Persist session in Supabase client
             const { data: setData, error: setError } = await this.supabase.auth.setSession({
               access_token: msg.access_token,
               refresh_token: msg.refresh_token,
@@ -154,24 +152,19 @@ export class AuthService {
             } else {
               console.log('🟢 Session set in Supabase client:', setData.session);
             }
-            // Fallback: manually persist to localStorage
-            const now = Math.floor(Date.now() / 1000);
-            const persist = {
-              ...session,
-              expires_at: now + session.expires_in,
-            };
-            localStorage.setItem('sb-database-auth-token', JSON.stringify(persist));
-            console.log('🟢 Session manually persisted to localStorage');
           } catch (e) {
-            console.warn('⚠️ Failed to set/persist session:', e);
+            console.warn('⚠️ Failed to set session in Supabase client:', e);
           }
+          // Fallback: manually persist to localStorage
+          const now = Math.floor(Date.now() / 1000);
+          const persist = { ...session, expires_at: now + session.expires_in };
+          localStorage.setItem('sb-database-auth-token', JSON.stringify(persist));
+          console.log('🟢 Session manually persisted to localStorage');
           finish(session);
           return;
         }
 
-        // Structured messages: validate origin
-        if (event.origin !== window.location.origin && event.origin !== oauthOrigin) return;
-
+        // Structured messages (oauth_success / oauth_error)
         if (msg.type === 'oauth_success' && msg.session) {
           console.log('🟢 Received oauth_success message');
           finish(msg.session);
