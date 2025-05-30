@@ -201,6 +201,15 @@ var AuthService = exports.AuthService = /*#__PURE__*/function () {
                 };
                 var finish = function finish(session) {
                   var _session$user;
+                  // Notify application about auth state change without page reload
+                  try {
+                    window.dispatchEvent(new CustomEvent('supabase.auth.changed', {
+                      detail: session
+                    }));
+                    console.log('🔔 Dispatched supabase.auth.changed event');
+                  } catch (e) {
+                    console.warn('⚠️ Failed to dispatch auth change event:', e);
+                  }
                   if (resolved) return;
                   resolved = true;
                   console.log('🟢 OAuth flow succeeded, provider:', provider, 'user:', (_session$user = session.user) === null || _session$user === void 0 ? void 0 : _session$user.email);
