@@ -160,7 +160,7 @@ export class AuthService {
               ...session,
               expires_at: now + session.expires_in,
             };
-            localStorage.setItem('supabase.auth.token', JSON.stringify(persist));
+            localStorage.setItem('sb-database-auth-token', JSON.stringify(persist));
             console.log('🟢 Session manually persisted to localStorage');
           } catch (e) {
             console.warn('⚠️ Failed to set/persist session:', e);
