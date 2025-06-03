@@ -52,7 +52,7 @@ function AuthWrapper(_ref) {
   }, "Sign in")))), /*#__PURE__*/_react["default"].createElement("div", {
     className: "security-footer"
   }, /*#__PURE__*/_react["default"].createElement("span", null, "Secured by"), /*#__PURE__*/_react["default"].createElement("img", {
-    src: "/placeholder.svg?height=16&width=60&query=security%20logo",
+    src: "https://altan.ai/logos/horizontalBlack.png",
     alt: "Security provider"
   })));
 }

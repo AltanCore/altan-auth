@@ -32,8 +32,6 @@ function AuthProvider(_ref) {
     _useState6 = _slicedToArray(_useState5, 2),
     loading = _useState6[0],
     setLoading = _useState6[1];
-
-  // 1) Inicializar sesión y suscripción a cambios de Supabase
   (0, _react.useEffect)(function () {
     service.getSession().then(function (_ref2) {
       var data = _ref2.data,
