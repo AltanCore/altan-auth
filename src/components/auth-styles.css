@@ -6,12 +6,12 @@
   --text-secondary: #64748b;
   --text-muted: #94a3b8;
   --border-color: #e2e8f0;
-  --border-focus: #6366f1;
+  --border-focus: #6366f1; /* Indigo, consider changing if not desired */
   --button-primary: #0f172a;
   --button-primary-hover: #1e293b;
   --button-secondary: #ffffff;
-  --link-color: #3b82f6;
-  --link-hover: #2563eb;
+  --link-color: #3b82f6; /* Blue, consider changing if not desired */
+  --link-hover: #2563eb; /* Blue, consider changing if not desired */
   --error-bg: #fef2f2;
   --error-border: #fecaca;
   --error-text: #dc2626;
@@ -31,9 +31,9 @@ body {
   background-color: var(--bg-page);
   color: var(--text-primary);
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* display: flex; /* These are handled by app/page.tsx for preview */
+  /* align-items: center; */
+  /* justify-content: center; */
 }
 
 .auth-wrapper {
@@ -176,7 +176,7 @@ body {
 .form-input:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); /* Indigo shadow */
 }
 
 .form-input:hover:not(:focus):not(:disabled) {
@@ -234,7 +234,7 @@ body {
   font-size: 0.875rem;
   color: #b91c1c;
   line-height: 1.5;
-  margin-left: 2rem;
+  margin-left: 2rem; /* This might need adjustment if error-icon is not always present */
 }
 
 /* Button styles */
@@ -260,7 +260,7 @@ body {
 }
 
 .btn-primary {
-  background-color: #0f172a;
+  background-color: var(--button-primary);
   color: white;
   border-radius: 6px;
   font-weight: 500;
@@ -278,7 +278,8 @@ body {
 }
 
 .btn-secondary {
-  background-color: #0f172a;
+  /* Note: btn-secondary has same styles as btn-primary in provided CSS */
+  background-color: var(--button-primary);
   color: white;
   border-radius: 6px;
   font-weight: 500;
@@ -298,7 +299,7 @@ body {
 .btn-link {
   background: none;
   border: none;
-  color: var(--link-color);
+  color: var(--link-color); /* Blue color */
   padding: 0;
   font-size: inherit;
   cursor: pointer;
@@ -307,7 +308,7 @@ body {
 }
 
 .btn-link:hover {
-  color: var(--link-hover);
+  color: var(--link-hover); /* Blue color */
   text-decoration: underline;
 }
 
@@ -331,6 +332,12 @@ body {
   opacity: 0.7;
 }
 
+.security-footer img {
+  /* MODIFICATION: Added this rule for logo size */
+  height: 24px;
+  width: auto;
+}
+
 /* Spinner */
 .spinner {
   width: 16px;
@@ -347,7 +354,7 @@ body {
   }
 }
 
-/* Remove container styles */
+
 .container {
   all: unset;
   display: flex;
@@ -355,9 +362,10 @@ body {
   justify-content: center;
   min-height: 100vh;
   padding: 2rem;
-}
+} 
 
-/* Hide tabs */
+
+/* Hide tabs if not used */
 .auth-tabs {
   display: none;
 }

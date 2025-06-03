@@ -9,7 +9,6 @@ export function AuthProvider({ supabase, children }) {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 1) Inicializar sesión y suscripción a cambios de Supabase
   useEffect(() => {
     service.getSession().then(({ data, error }) => {
       if (error) {

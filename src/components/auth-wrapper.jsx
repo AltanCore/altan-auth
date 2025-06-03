@@ -19,7 +19,7 @@ export function AuthWrapper({ defaultTab = "signin", onSignInSuccess, onSignUpSu
         <p className="auth-footer-text">
           {activeTab === "signin" ? (
             <>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <button onClick={() => setActiveTab("signup")} className="btn-link">
                 Sign up
               </button>
@@ -37,7 +37,7 @@ export function AuthWrapper({ defaultTab = "signin", onSignInSuccess, onSignUpSu
 
       <div className="security-footer">
         <span>Secured by</span>
-        <img src="/placeholder.svg?height=16&width=60&query=security%20logo" alt="Security provider" />
+        <img src="https://altan.ai/logos/horizontalBlack.png" alt="Security provider" />
       </div>
     </div>
   )
